@@ -1,0 +1,36 @@
+name: ServerEssentials
+author: Vašek Carlo Šrubař
+version: '${project.version}'
+api-version: '1.20'
+main: me.vasek.serveressentials.ServerEssentials
+commands:
+  ban:
+    description: Bans a player.
+    usage: /ban <player> [reason]
+    permission: serveressentials.ban
+  unban:
+    description: Unbans a player.
+    usage: /unban <player>
+    permission: serveressentials.unban
+  kick:
+    description: Kicks a player.
+    usage: /kick <player> [reason]
+    permission: serveressentials.kick
+  playerinfo:
+    description: Shows info about a player.
+    usage: /playerinfo <player>
+    permission: serveressentials.playerinfo
+permissions:
+  serveressentials.ban:
+    description: Allows the player to ban others.
+    default: op
+  serveressentials.unban:
+    description: Allows the player to unban others.
+    default: op
+  serveressentials.kick:
+    description: Allows the player to kick others.
+    default: op
+  serveressentials.playerinfo:
+    description: Allows the player to get info about others.
+    default: op
+
