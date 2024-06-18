@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
@@ -14,6 +15,7 @@ import java.io.File
 
 class ServerEssentials : JavaPlugin(), Listener {
     private lateinit var configFile: ConfigFile
+    private val mutedPlayers = mutableSetOf<String>()
 
     override fun onEnable() {
         logger.info("ModerationPlugin has been enabled!")
@@ -25,6 +27,14 @@ class ServerEssentials : JavaPlugin(), Listener {
 
     override fun onDisable() {
         logger.info("ModerationPlugin has been disabled!")
+    }
+
+    @EventHandler
+    fun onPlayerChat(event: AsyncPlayerChatEvent) {
+        if (mutedPlayers.contains(event.player.name)) {
+            event.player.sendMessage("${ChatColor.RED}You are muted and cannot send messages.")
+            event.isCancelled = true
+        }
     }
 
     @EventHandler
@@ -118,6 +128,34 @@ class ServerEssentials : JavaPlugin(), Listener {
                     }
                 } else {
                     sender.sendMessage("${ChatColor.RED}Player not found!")
+                }
+                return true
+            }
+            "mute" -> {
+                if (args.isEmpty()) {
+                    sender.sendMessage("Usage: /mute <player>")
+                    return true
+                }
+                val playerName = args[0]
+                if (mutedPlayers.contains(playerName)) {
+                    sender.sendMessage("${ChatColor.RED}$playerName is already muted.")
+                } else {
+                    mutedPlayers.add(playerName)
+                    sender.sendMessage("${ChatColor.DARK_RED}$playerName has been muted.")
+                }
+                return true
+            }
+            "unmute" -> {
+                if (args.isEmpty()) {
+                    sender.sendMessage("Usage: /unmute <player>")
+                    return true
+                }
+                val playerName = args[0]
+                if (!mutedPlayers.contains(playerName)) {
+                    sender.sendMessage("${ChatColor.RED}$playerName is not muted.")
+                } else {
+                    mutedPlayers.remove(playerName)
+                    sender.sendMessage("${ChatColor.GREEN}$playerName has been unmuted.")
                 }
                 return true
             }
