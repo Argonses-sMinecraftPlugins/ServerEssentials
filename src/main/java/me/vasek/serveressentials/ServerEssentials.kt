@@ -2,46 +2,41 @@ package me.vasek.serveressentials
 
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
-import java.io.File
 
 class ServerEssentials : JavaPlugin(), Listener {
+    private lateinit var muteManager: MuteManager
+    private lateinit var commandHandler: CommandHandler
     private lateinit var configFile: ConfigFile
-    private val mutedPlayers = mutableSetOf<String>()
 
     override fun onEnable() {
-        logger.info("ModerationPlugin has been enabled!")
+        logger.info("ServerEssentials has been enabled!")
+        muteManager = MuteManager()
         configFile = ConfigFile()
+        commandHandler = CommandHandler(muteManager, configFile)
+
         configFile.setup(dataFolder)
 
         server.pluginManager.registerEvents(this, this)
-    }
-
-    override fun onDisable() {
-        logger.info("ModerationPlugin has been disabled!")
-    }
-
-    @EventHandler
-    fun onPlayerChat(event: AsyncPlayerChatEvent) {
-        if (mutedPlayers.contains(event.player.name)) {
-            event.player.sendMessage("${ChatColor.RED}You are muted and cannot send messages.")
-            event.isCancelled = true
-        }
+        getCommand("ban")?.setExecutor(commandHandler)
+        getCommand("unban")?.setExecutor(commandHandler)
+        getCommand("kick")?.setExecutor(commandHandler)
+        getCommand("playerinfo")?.setExecutor(commandHandler)
+        getCommand("mute")?.setExecutor(commandHandler)
+        getCommand("unmute")?.setExecutor(commandHandler)
+        getCommand("op")?.setExecutor(commandHandler)
     }
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
         val playerName = player.name
-        val message = "${ChatColor.GREEN}Hi, $playerName! Welcome to server!"
+        val message = "${ChatColor.GREEN}Hello, $playerName! Welcome to server!"
 
         Bukkit.broadcastMessage(message)
     }
@@ -50,167 +45,21 @@ class ServerEssentials : JavaPlugin(), Listener {
     fun onPlayerQuit(event: PlayerQuitEvent) {
         val player = event.player
         val playerName = player.name
-        val message = "${ChatColor.GOLD}See you soon, $playerName!"
+        val message = "${ChatColor.AQUA}Goodbye $playerName!"
 
         Bukkit.broadcastMessage(message)
     }
 
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
-        when (command.name.toLowerCase()) {
-            "ban" -> {
-                if (args.isEmpty()) {
-                    sender.sendMessage("Usage: /ban <player> [reason]")
-                    return true
-                }
-                val playerName = args[0]
-                val reason = if (args.size > 1) args.drop(1).joinToString(" ") else "You have been banned!"
-                configFile.banPlayer(playerName, reason)
-                val player = Bukkit.getPlayer(playerName)
-                player?.kickPlayer(reason)
-                sender.sendMessage("Player $playerName has been banned for: $reason")
-                return true
-            }
-            "unban" -> {
-                if (args.isEmpty()) {
-                    sender.sendMessage("Usage: /unban <player>")
-                    return true
-                }
-                val playerName = args[0]
-                configFile.unbanPlayer(playerName)
-                sender.sendMessage("Player $playerName has been unbanned.")
-                return true
-            }
-            "kick" -> {
-                if (args.isEmpty()) {
-                    sender.sendMessage("Usage: /kick <player> [reason]")
-                    return true
-                }
-                val playerName = args[0]
-                val reason = if (args.size > 1) args.drop(1).joinToString(" ") else "You have been kicked!"
-                val player = Bukkit.getPlayer(playerName)
-                player?.kickPlayer(reason)
-                sender.sendMessage("Player $playerName has been kicked for: $reason")
-                return true
-            }
-            "playerinfo" -> {
-                if (args.isEmpty()) {
-                    sender.sendMessage("Usage: /playerinfo <player>")
-                    return true
-                }
-                val playerName = args[0]
-                val player = Bukkit.getPlayer(playerName)
-                if (player == null) {
-                    sender.sendMessage("Player not found!")
-                    return true
-                }
-                sender.sendMessage("Player: ${player.name}")
-                sender.sendMessage("UUID: ${player.uniqueId}")
-                sender.sendMessage("IP: ${player.address?.address?.hostAddress}")
-                sender.sendMessage("Location: ${player.location}")
-                sender.sendMessage("Health: ${player.health}")
-                sender.sendMessage("Food Level: ${player.foodLevel}")
-                return true
-            }
-            "op" -> {
-                if (args.isEmpty()) {
-                    sender.sendMessage("Usage: /op <player>")
-                    return true
-                }
-                val playerName = args[0]
-                val player = Bukkit.getPlayer(playerName)
-                if (player != null) {
-                    if (player.isOp) {
-                        sender.sendMessage("${ChatColor.RED}${player.name} is already an operator.")
-                    } else {
-                        player.isOp = true
-                        sender.sendMessage("${ChatColor.GREEN}${player.name} has been made an operator.")
-                        player.sendMessage("${ChatColor.GREEN}You are now an operator.")
-                    }
-                } else {
-                    sender.sendMessage("${ChatColor.RED}Player not found!")
-                }
-                return true
-            }
-            "mute" -> {
-                if (args.isEmpty()) {
-                    sender.sendMessage("Usage: /mute <player>")
-                    return true
-                }
-                val playerName = args[0]
-                if (mutedPlayers.contains(playerName)) {
-                    sender.sendMessage("${ChatColor.RED}$playerName is already muted.")
-                } else {
-                    mutedPlayers.add(playerName)
-                    sender.sendMessage("${ChatColor.DARK_RED}$playerName has been muted.")
-                }
-                return true
-            }
-            "unmute" -> {
-                if (args.isEmpty()) {
-                    sender.sendMessage("Usage: /unmute <player>")
-                    return true
-                }
-                val playerName = args[0]
-                if (!mutedPlayers.contains(playerName)) {
-                    sender.sendMessage("${ChatColor.RED}$playerName is not muted.")
-                } else {
-                    mutedPlayers.remove(playerName)
-                    sender.sendMessage("${ChatColor.GREEN}$playerName has been unmuted.")
-                }
-                return true
-            }
-        }
-        return false
-    }
-}
-
-class ConfigFile {
-    private lateinit var conf: File
-
-    fun setup(dir: File) {
-        if (!dir.exists()) {
-            dir.mkdirs()
-        }
-        conf = File(dir, "banned.yml")
-        if (!conf.exists()) {
-            val config = YamlConfiguration.loadConfiguration(conf)
-            try {
-                config.save(conf)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+    override fun onDisable() {
+        logger.info("ServerEssentials has been disabled!")
     }
 
-    fun banPlayer(player: String, reason: String) {
-        val config = YamlConfiguration.loadConfiguration(conf)
-        config.set("banned.players.$player", reason)
-        try {
-            config.save(conf)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    fun getBanReason(player: String): String? {
-        val config = YamlConfiguration.loadConfiguration(conf)
-        return config.getString("banned.players.$player")
-    }
-
-    fun isBanned(player: String): Boolean {
-        val config = YamlConfiguration.loadConfiguration(conf)
-        return config.contains("banned.players.$player")
-    }
-
-    fun unbanPlayer(player: String) {
-        if (isBanned(player)) {
-            val config = YamlConfiguration.loadConfiguration(conf)
-            config.set("banned.players.$player", null)
-            try {
-                config.save(conf)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    @EventHandler
+    fun onPlayerChat(event: AsyncPlayerChatEvent) {
+        if (muteManager.isMuted(event.player.name)) {
+            event.player.sendMessage("${ChatColor.RED}You are muted and cannot send messages.")
+            event.isCancelled = true
         }
     }
 }
+
