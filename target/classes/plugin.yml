@@ -20,6 +20,10 @@ commands:
     description: Shows info about a player.
     usage: /playerinfo <player>
     permission: serveressentials.playerinfo
+  op:
+    description: Makes from regular person an OP
+    usage: /op <player>
+    permission: serveressentials.op
 permissions:
   serveressentials.ban:
     description: Allows the player to ban others.
@@ -32,5 +36,8 @@ permissions:
     default: op
   serveressentials.playerinfo:
     description: Allows the player to get info about others.
+    default: op
+  serveressentials.op:
+    description: Allows player to op other players
     default: op
 

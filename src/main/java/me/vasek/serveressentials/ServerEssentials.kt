@@ -5,12 +5,11 @@ import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
 class ServerEssentials : JavaPlugin(), Listener {
@@ -100,6 +99,26 @@ class ServerEssentials : JavaPlugin(), Listener {
                 sender.sendMessage("Location: ${player.location}")
                 sender.sendMessage("Health: ${player.health}")
                 sender.sendMessage("Food Level: ${player.foodLevel}")
+                return true
+            }
+            "op" -> {
+                if (args.isEmpty()) {
+                    sender.sendMessage("Usage: /op <player>")
+                    return true
+                }
+                val playerName = args[0]
+                val player = Bukkit.getPlayer(playerName)
+                if (player != null) {
+                    if (player.isOp) {
+                        sender.sendMessage("${ChatColor.RED}${player.name} is already an operator.")
+                    } else {
+                        player.isOp = true
+                        sender.sendMessage("${ChatColor.GREEN}${player.name} has been made an operator.")
+                        player.sendMessage("${ChatColor.GREEN}You are now an operator.")
+                    }
+                } else {
+                    sender.sendMessage("${ChatColor.RED}Player not found!")
+                }
                 return true
             }
         }
