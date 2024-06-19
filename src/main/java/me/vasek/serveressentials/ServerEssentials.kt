@@ -5,6 +5,7 @@ import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
@@ -59,6 +60,17 @@ class ServerEssentials : JavaPlugin(), Listener {
         if (muteManager.isMuted(event.player.name)) {
             event.player.sendMessage("${ChatColor.RED}You are muted and cannot send messages.")
             event.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun onPlayerBedEnterEvent(event: PlayerBedEnterEvent) {
+        if (event.bedEnterResult == PlayerBedEnterEvent.BedEnterResult.OK) {
+            val player = event.player
+            val playerName = player.name
+            val message = "${ChatColor.GOLD}Shhhh, $playerName went to sleep!"
+
+            Bukkit.broadcastMessage(message)
         }
     }
 }

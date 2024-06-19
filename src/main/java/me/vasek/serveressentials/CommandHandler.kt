@@ -112,6 +112,7 @@ class CommandHandler(private val muteManager: MuteManager, private val configFil
                 }
                 return true
             }
+
         }
         return false
     }
