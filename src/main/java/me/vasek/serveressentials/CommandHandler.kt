@@ -112,7 +112,23 @@ class CommandHandler(private val muteManager: MuteManager, private val configFil
                 }
                 return true
             }
+            "allcommands" -> {
+                val commands = listOf(
+                    "${ChatColor.GREEN}/ban <player> [reason] - ${ChatColor.LIGHT_PURPLE}Bans a player.",
+                    "${ChatColor.GREEN}/unban <player> - ${ChatColor.LIGHT_PURPLE}Unbans a player.",
+                    "${ChatColor.GREEN}/kick <player> [reason] - ${ChatColor.LIGHT_PURPLE}Kicks a player.",
+                    "${ChatColor.GREEN}/playerinfo <player> - ${ChatColor.LIGHT_PURPLE}Shows info about a player.",
+                    "${ChatColor.GREEN}/op <player> - ${ChatColor.LIGHT_PURPLE}Makes from regular person an OP.",
+                    "${ChatColor.GREEN}/mute <player> - ${ChatColor.LIGHT_PURPLE}Mutes other player.",
+                    "${ChatColor.GREEN}/unmute <player> - ${ChatColor.LIGHT_PURPLE}Unmutes other player.",
+                    "${ChatColor.GREEN}/allcommands - ${ChatColor.LIGHT_PURPLE}Shows all commands."
+                )
 
+                sender.sendMessage("${ChatColor.GOLD}Available ServerEssentials Commands:")
+                commands.forEach { command ->
+                    sender.sendMessage(command)
+                }
+            }
         }
         return false
     }

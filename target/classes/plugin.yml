@@ -24,6 +24,10 @@ commands:
     description: Makes from regular person an OP
     usage: /op <player>
     permission: serveressentials.op
+  deop:
+    description: Makes from OP person a regular player
+    usage: /deop <player>
+    permission: serveressentials.deop
   mute:
     description: Mutes other player
     usage: /mute <player>
@@ -32,6 +36,9 @@ commands:
     description: Unmutes other player
     usage: /unmute <player>
     permission: serveressentials.op
+  allcommands:
+    description: Shows all commands
+    usage: /allcommands
 permissions:
   serveressentials.ban:
     description: Allows the player to ban others.
@@ -47,6 +54,9 @@ permissions:
     default: op
   serveressentials.op:
     description: Allows player to op other players
+    default: op
+  serveressentials.deop:
+    description: Allows player to deop other players
     default: op
   serveressentials.mute:
     description: Allows player to mute other players

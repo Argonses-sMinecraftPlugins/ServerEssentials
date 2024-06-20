@@ -32,6 +32,9 @@ commands:
     description: Unmutes other player
     usage: /unmute <player>
     permission: serveressentials.op
+  allcommands:
+    description: Shows all commands
+    usage: /allcommands
 permissions:
   serveressentials.ban:
     description: Allows the player to ban others.

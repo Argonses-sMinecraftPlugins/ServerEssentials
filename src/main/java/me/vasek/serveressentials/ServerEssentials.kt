@@ -31,15 +31,21 @@ class ServerEssentials : JavaPlugin(), Listener {
         getCommand("mute")?.setExecutor(commandHandler)
         getCommand("unmute")?.setExecutor(commandHandler)
         getCommand("op")?.setExecutor(commandHandler)
+        getCommand("allcommands")?.setExecutor(commandHandler)
     }
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
         val playerName = player.name
-        val message = "${ChatColor.GREEN}Hello, $playerName! Welcome to server!"
 
-        Bukkit.broadcastMessage(message)
+        if (configFile.isBanned(playerName)) {
+            val reason = configFile.getBanReason(playerName) ?: "You have been banned from this server!"
+            player.kickPlayer(reason)
+        } else {
+            val message = "${ChatColor.GREEN}Hello, $playerName! Welcome to the server!"
+            Bukkit.broadcastMessage(message)
+        }
     }
 
     @EventHandler
@@ -57,10 +63,21 @@ class ServerEssentials : JavaPlugin(), Listener {
 
     @EventHandler
     fun onPlayerChat(event: AsyncPlayerChatEvent) {
-        if (muteManager.isMuted(event.player.name)) {
-            event.player.sendMessage("${ChatColor.RED}You are muted and cannot send messages.")
+        val player = event.player
+
+        if (muteManager.isMuted(player.name)) {
+            player.sendMessage("${ChatColor.RED}You are muted and cannot send messages.")
             event.isCancelled = true
+            return
         }
+
+        val prefix = if (player.isOp) {
+            "${ChatColor.AQUA}[OP]${ChatColor.RESET}"
+        } else {
+            "${ChatColor.GREEN}[Member]${ChatColor.RESET}"
+        }
+
+        event.format = "$prefix ${player.displayName}: ${event.message}"
     }
 
     @EventHandler
