@@ -112,15 +112,36 @@ class CommandHandler(private val muteManager: MuteManager, private val configFil
                 }
                 return true
             }
+            "heal" -> {
+                if (args.isEmpty()) {
+                    sender.sendMessage("Usage: /heal <player>")
+                    return true
+                }
+
+                val playerName = args[0]
+                val player = Bukkit.getPlayer(playerName)
+
+                if (player == null) {
+                    sender.sendMessage("Player not found.")
+                    return true
+                }
+
+                player.health = player.maxHealth
+                player.sendMessage("You have been healed to full health!")
+                sender.sendMessage("${player.name} has been healed to full health.")
+
+                return true
+            }
             "allcommands" -> {
                 val commands = listOf(
-                    "${ChatColor.GREEN}/ban <player> [reason] - ${ChatColor.LIGHT_PURPLE}Bans a player.",
-                    "${ChatColor.GREEN}/unban <player> - ${ChatColor.LIGHT_PURPLE}Unbans a player.",
-                    "${ChatColor.GREEN}/kick <player> [reason] - ${ChatColor.LIGHT_PURPLE}Kicks a player.",
-                    "${ChatColor.GREEN}/playerinfo <player> - ${ChatColor.LIGHT_PURPLE}Shows info about a player.",
-                    "${ChatColor.GREEN}/op <player> - ${ChatColor.LIGHT_PURPLE}Makes from regular person an OP.",
-                    "${ChatColor.GREEN}/mute <player> - ${ChatColor.LIGHT_PURPLE}Mutes other player.",
-                    "${ChatColor.GREEN}/unmute <player> - ${ChatColor.LIGHT_PURPLE}Unmutes other player.",
+                    "${ChatColor.GREEN}/ban <player> [reason] - ${ChatColor.LIGHT_PURPLE}Bans a player. | OP",
+                    "${ChatColor.GREEN}/unban <player> - ${ChatColor.LIGHT_PURPLE}Unbans a player. | OP",
+                    "${ChatColor.GREEN}/kick <player> [reason] - ${ChatColor.LIGHT_PURPLE}Kicks a player. | OP",
+                    "${ChatColor.GREEN}/playerinfo <player> - ${ChatColor.LIGHT_PURPLE}Shows info about a player. | OP",
+                    "${ChatColor.GREEN}/op <player> - ${ChatColor.LIGHT_PURPLE}Makes from regular person an OP. | OP",
+                    "${ChatColor.GREEN}/heal <player> - ${ChatColor.LIGHT_PURPLE}Heals other player. | OP",
+                    "${ChatColor.GREEN}/mute <player> - ${ChatColor.LIGHT_PURPLE}Mutes other player. | OP",
+                    "${ChatColor.GREEN}/unmute <player> - ${ChatColor.LIGHT_PURPLE}Unmutes other player. | OP",
                     "${ChatColor.GREEN}/allcommands - ${ChatColor.LIGHT_PURPLE}Shows all commands."
                 )
 

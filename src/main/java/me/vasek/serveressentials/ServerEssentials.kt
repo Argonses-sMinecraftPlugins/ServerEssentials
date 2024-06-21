@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -31,6 +32,7 @@ class ServerEssentials : JavaPlugin(), Listener {
         getCommand("mute")?.setExecutor(commandHandler)
         getCommand("unmute")?.setExecutor(commandHandler)
         getCommand("op")?.setExecutor(commandHandler)
+        getCommand("heal")?.setExecutor(commandHandler)
         getCommand("allcommands")?.setExecutor(commandHandler)
     }
 

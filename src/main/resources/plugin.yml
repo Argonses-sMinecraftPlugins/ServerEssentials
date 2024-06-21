@@ -32,6 +32,10 @@ commands:
     description: Unmutes other player
     usage: /unmute <player>
     permission: serveressentials.op
+  heal:
+    description: Heals other player
+    usage: /heal <player>
+    permission: serveressentials.op
   allcommands:
     description: Shows all commands
     usage: /allcommands
@@ -56,5 +60,8 @@ permissions:
     default: op
   serveressentials.unmute:
     description: Allows player to unmute other players
+    default: op
+  serveressentials.heal:
+    description: Allows player to heal other players
     default: op
 
