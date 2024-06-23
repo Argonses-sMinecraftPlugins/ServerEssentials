@@ -33,6 +33,10 @@ class ServerEssentials : JavaPlugin(), Listener {
         getCommand("unmute")?.setExecutor(commandHandler)
         getCommand("op")?.setExecutor(commandHandler)
         getCommand("heal")?.setExecutor(commandHandler)
+        getCommand("tp")?.setExecutor(commandHandler)
+        getCommand("tpaccept")?.setExecutor(commandHandler)
+        getCommand("tpdeny")?.setExecutor(commandHandler)
+        getCommand("feed")?.setExecutor(commandHandler)
         getCommand("allcommands")?.setExecutor(commandHandler)
     }
 

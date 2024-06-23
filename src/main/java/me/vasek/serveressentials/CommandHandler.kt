@@ -5,8 +5,11 @@ import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 class CommandHandler(private val muteManager: MuteManager, private val configFile: ConfigFile) : CommandExecutor {
+
+    private val tpRequests = mutableMapOf<Player, Player>()
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
         when (command.name.toLowerCase()) {
@@ -132,6 +135,95 @@ class CommandHandler(private val muteManager: MuteManager, private val configFil
 
                 return true
             }
+            "feed" -> {
+                if (args.isEmpty()) {
+                    sender.sendMessage("Usage: /feed <player>")
+                    return true
+                }
+
+                val playerName = args[0]
+                val player = Bukkit.getPlayer(playerName)
+
+                if (player == null) {
+                    sender.sendMessage("Player not found.")
+                    return true
+                }
+
+                player.foodLevel = 20
+                player.sendMessage("You have been fed to full feed!")
+                sender.sendMessage("${player.name} has been fed to full level.")
+
+                return true
+            }
+            "tp" -> {
+                if (args.isEmpty()) {
+                    sender.sendMessage("Usage: /tp <player>")
+                    return true
+                }
+
+                if (sender !is Player) {
+                    sender.sendMessage("Only players can use this command.")
+                    return true
+                }
+
+                val player: Player = sender
+                val target = Bukkit.getPlayer(args[0])
+
+                if (target == null) {
+                    player.sendMessage("Player not found.")
+                    return true
+                }
+
+                if (target == player) {
+                    player.sendMessage("You cannot teleport to yourself.")
+                    return true
+                }
+
+                tpRequests[target] = player
+                target.sendMessage("${player.name} wants to teleport to you. Type /tpaccept to accept or /tpdeny to deny.")
+                player.sendMessage("Teleport request sent to ${target.name}.")
+                return true
+            }
+            "tpaccept" -> {
+                if (sender !is Player) {
+                    sender.sendMessage("Only players can use this command.")
+                    return true
+                }
+
+                val player: Player = sender
+                val requester = tpRequests[player]
+
+                if (requester == null) {
+                    player.sendMessage("No teleport requests found.")
+                    return true
+                }
+
+                requester.teleport(player.location)
+                player.sendMessage("You have accepted the teleport request.")
+                requester.sendMessage("${player.name} has accepted your teleport request.")
+                tpRequests.remove(player)
+                return true
+            }
+            "tpdeny" -> {
+                if (sender !is Player) {
+                    sender.sendMessage("Only players can use this command.")
+                    return true
+                }
+
+                val player: Player = sender
+                val requester = tpRequests[player]
+
+                if (requester == null) {
+                    player.sendMessage("No teleport requests found.")
+                    return true
+                }
+
+                player.sendMessage("You have denied the teleport request.")
+                requester.sendMessage("${player.name} has denied your teleport request.")
+                tpRequests.remove(player)
+                return true
+            }
+
             "allcommands" -> {
                 val commands = listOf(
                     "${ChatColor.GREEN}/ban <player> [reason] - ${ChatColor.LIGHT_PURPLE}Bans a player. | OP",
@@ -142,6 +234,9 @@ class CommandHandler(private val muteManager: MuteManager, private val configFil
                     "${ChatColor.GREEN}/heal <player> - ${ChatColor.LIGHT_PURPLE}Heals other player. | OP",
                     "${ChatColor.GREEN}/mute <player> - ${ChatColor.LIGHT_PURPLE}Mutes other player. | OP",
                     "${ChatColor.GREEN}/unmute <player> - ${ChatColor.LIGHT_PURPLE}Unmutes other player. | OP",
+                    "${ChatColor.GREEN}/tp <player> - ${ChatColor.LIGHT_PURPLE}Sends a teleport request to another player. | OP",
+                    "${ChatColor.GREEN}/tpaccept - ${ChatColor.LIGHT_PURPLE}Accepts a teleport request. | OP",
+                    "${ChatColor.GREEN}/tpdeny - ${ChatColor.LIGHT_PURPLE}Denies a teleport request. | OP",
                     "${ChatColor.GREEN}/allcommands - ${ChatColor.LIGHT_PURPLE}Shows all commands."
                 )
 
