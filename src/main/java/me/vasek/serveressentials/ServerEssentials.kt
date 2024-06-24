@@ -37,6 +37,7 @@ class ServerEssentials : JavaPlugin(), Listener {
         getCommand("tpaccept")?.setExecutor(commandHandler)
         getCommand("tpdeny")?.setExecutor(commandHandler)
         getCommand("feed")?.setExecutor(commandHandler)
+        getCommand("msg")?.setExecutor(commandHandler)
         getCommand("allcommands")?.setExecutor(commandHandler)
     }
 

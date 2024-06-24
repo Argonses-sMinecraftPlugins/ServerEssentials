@@ -223,7 +223,29 @@ class CommandHandler(private val muteManager: MuteManager, private val configFil
                 tpRequests.remove(player)
                 return true
             }
+            "msg" -> {
+                if (args.size < 2) {
+                    sender.sendMessage("Usage: /msg <player> <message>")
+                    return false
+                }
 
+                val targetPlayerName = args[0]
+                val message = args.drop(1).joinToString(" ")
+
+                val targetPlayer = Bukkit.getPlayerExact(targetPlayerName)
+                if (targetPlayer == null) {
+                    sender.sendMessage("Player not found: $targetPlayerName")
+                    return true
+                }
+
+                if (sender is Player) {
+                    targetPlayer.sendMessage("${ChatColor.GOLD}Private message from ${ChatColor.BLUE}${sender.name}${ChatColor.RESET}: ${ChatColor.BOLD}$message${ChatColor.RESET}")
+                } else {
+                    targetPlayer.sendMessage("${ChatColor.GRAY}Private message from server: ${ChatColor.RESET}$message")
+                }
+
+                return true
+            }
             "allcommands" -> {
                 val commands = listOf(
                     "${ChatColor.GREEN}/ban <player> [reason] - ${ChatColor.LIGHT_PURPLE}Bans a player. | OP",
@@ -234,9 +256,10 @@ class CommandHandler(private val muteManager: MuteManager, private val configFil
                     "${ChatColor.GREEN}/heal <player> - ${ChatColor.LIGHT_PURPLE}Heals other player. | OP",
                     "${ChatColor.GREEN}/mute <player> - ${ChatColor.LIGHT_PURPLE}Mutes other player. | OP",
                     "${ChatColor.GREEN}/unmute <player> - ${ChatColor.LIGHT_PURPLE}Unmutes other player. | OP",
-                    "${ChatColor.GREEN}/tp <player> - ${ChatColor.LIGHT_PURPLE}Sends a teleport request to another player. | OP",
-                    "${ChatColor.GREEN}/tpaccept - ${ChatColor.LIGHT_PURPLE}Accepts a teleport request. | OP",
-                    "${ChatColor.GREEN}/tpdeny - ${ChatColor.LIGHT_PURPLE}Denies a teleport request. | OP",
+                    "${ChatColor.GREEN}/tp <player> - ${ChatColor.LIGHT_PURPLE}Sends a teleport request to another player.",
+                    "${ChatColor.GREEN}/tpaccept - ${ChatColor.LIGHT_PURPLE}Accepts a teleport request.",
+                    "${ChatColor.GREEN}/tpdeny - ${ChatColor.LIGHT_PURPLE}Denies a teleport request.",
+                    "${ChatColor.GREEN}/msg - ${ChatColor.LIGHT_PURPLE}Sends private message to other player.",
                     "${ChatColor.GREEN}/allcommands - ${ChatColor.LIGHT_PURPLE}Shows all commands."
                 )
 

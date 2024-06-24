@@ -39,19 +39,19 @@ commands:
   tp:
     description: Teleports to other player
     usage: /tp <player>
-    permission: serveressentials.op
   tpaccept:
     description: Accepts the teleportation of other player
     usage: /tpaccept
-    permission: serveressentials.op
   tpdeny:
     description: Refuses the teleportation of other player
     usage: /tpdeny
-    permission: serveressentials.op
   feed:
     description: Feeds other player
     usage: /feed <player>
     permission: serveressentials.op
+  msg:
+    description: Sends private message to other player
+    usage: /msg <player> <message>
   allcommands:
     description: Shows all commands
     usage: /allcommands
@@ -79,15 +79,6 @@ permissions:
     default: op
   serveressentials.heal:
     description: Allows player to heal other players
-    default: op
-  serveressentials.tp:
-    description: Allows player to teleport to other player
-    default: op
-  serveressentials.tpaccept:
-    description: Allows player to teleport to someone
-    default: op
-  serveressentials.tpdeny:
-    description: Refuses player to teleport to someone
     default: op
   serveressentials.feed:
     description: Allows player to feed other player
